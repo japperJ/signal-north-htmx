@@ -42,6 +42,9 @@ func TestTemplatesAndHomePage(t *testing.T) {
 	body := res.Body.String()
 	for _, text := range []string{
 		"Signal North",
+		"zero custom application JavaScript",
+		"Server-rendered HTML",
+		"HTMX handles browser behavior",
 		"Refresh telemetry",
 		"Search commands",
 		"Send command",

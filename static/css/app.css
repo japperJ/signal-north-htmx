@@ -49,6 +49,11 @@ button, a, input { -webkit-tap-highlight-color: transparent; }
 .button-secondary { border-color: var(--line); background: transparent; color: var(--warm); }
 .button-secondary:hover { border-color: var(--lime); color: var(--lime); }
 .boost-target { position: relative; z-index: 1; display: inline-flex; margin-top: 30px; padding: 10px 13px; border-left: 2px solid var(--cyan); color: var(--muted); font-size: 12px; }
+.hero-proof { position: relative; z-index: 1; display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); max-width: 670px; margin-top: 38px; border-top: 1px solid var(--line); border-bottom: 1px solid var(--line); }
+.hero-proof div { display: flex; flex-direction: column; gap: 7px; padding: 15px 18px 15px 0; }
+.hero-proof div + div { border-left: 1px solid var(--line); padding-left: 18px; }
+.hero-proof strong { color: var(--lime); font-size: 15px; letter-spacing: .04em; }
+.hero-proof span { color: var(--muted); font-size: 10px; line-height: 1.4; text-transform: uppercase; letter-spacing: .08em; }
 
 .metric-strip { display: grid; grid-template-columns: repeat(4, 1fr); gap: 1px; background: var(--line); border: 1px solid var(--line); box-shadow: var(--shadow); }
 .metric-card { min-height: 132px; padding: 22px; background: var(--panel); }
@@ -172,6 +177,8 @@ button, a, input { -webkit-tap-highlight-color: transparent; }
   .hero-copy { font-size: 15px; }
   .hero-actions, .input-row, .activity-form { align-items: stretch; flex-direction: column; }
   .hero-note { font-size: 9px; }
+  .hero-proof div { padding-right: 9px; }
+  .hero-proof div + div { padding-left: 9px; }
   .panel { padding: 21px 17px; }
   .metric-card { min-height: 112px; padding: 16px; }
   .metric-value { font-size: 29px; }

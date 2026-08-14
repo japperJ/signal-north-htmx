@@ -18,9 +18,14 @@
       <p class="hero-copy">A working field guide to server-driven interfaces. Every panel below is rendered by Go, requested by HTMX, and swapped as HTML.</p>
       <div class="hero-actions">
         <a class="button button-primary" href="/demo/status" hx-boost="true" hx-target="#boost-target" hx-swap="innerHTML">Open live status</a>
-        <span class="hero-note"><span class="pulse-dot"></span> No client state required</span>
+        <span class="hero-note"><span class="pulse-dot"></span> zero custom application JavaScript</span>
       </div>
       <div id="boost-target" class="boost-target" aria-live="polite">Boost a route to inspect its server-rendered response.</div>
+      <div class="hero-proof" aria-label="Implementation model">
+        <div><strong>HTML</strong><span>Server-rendered HTML</span></div>
+        <div><strong>HTMX</strong><span>HTMX handles browser behavior</span></div>
+        <div><strong>0 JS</strong><span>No custom app state</span></div>
+      </div>
     </section>
 
     <section class="metric-strip" aria-label="Operational metrics">
