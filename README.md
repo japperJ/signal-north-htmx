@@ -137,11 +137,7 @@ vercel deploy --prebuilt --prod --yes --project signal-north-htmx
 
 The Wincontainer and Vercel deployments are independent.
 
-GitHub Actions runs the Go tests, race tests, static analysis, and Playwright suite on pull requests and pushes. A push to `main` deploys the prebuilt output to the Vercel project. Configure these repository secrets:
-
-- `VERCEL_TOKEN`
-- `VERCEL_ORG_ID`
-- `VERCEL_PROJECT_ID`
+GitHub Actions runs the Go tests, race tests, static analysis, and Playwright suite on pull requests and pushes. The Vercel project is connected to this GitHub repository through Vercel Git Integration, so pushes to `main` trigger the Vercel production deployment without storing a Vercel token in GitHub Actions.
 
 ## HTTP Routes
 
