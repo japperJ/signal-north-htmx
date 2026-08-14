@@ -183,7 +183,7 @@ func TestExplanations(t *testing.T) {
 		res := httptest.NewRecorder()
 		app.ServeHTTP(res, httptest.NewRequest(http.MethodGet, "/demo/explain?demo="+demo, nil))
 		body := res.Body.String()
-		if res.Code != http.StatusOK || !strings.Contains(body, "HTMX") || !strings.Contains(body, "Server") || !strings.Contains(body, "Browser") {
+		if res.Code != http.StatusOK || !strings.Contains(body, "HTMX") || !strings.Contains(body, "Server") || !strings.Contains(body, "Browser") || !strings.Contains(body, "Show exact Go function") || !strings.Contains(body, "Show exact HTMX markup") || !strings.Contains(body, "func (s *Server) handle") || !strings.Contains(body, "hx-") {
 			t.Fatalf("explanation %q = %d %s", demo, res.Code, body)
 		}
 	}

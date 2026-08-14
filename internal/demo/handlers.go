@@ -43,6 +43,8 @@ type explanationData struct {
 	HTMX   string
 	Server string
 	Client string
+	Markup string
+	Code   string
 }
 
 var explanations = map[string]explanationData{
@@ -51,48 +53,113 @@ var explanations = map[string]explanationData{
 		HTMX:   "The button sends hx-get to /demo/telemetry, shows hx-indicator while waiting, then swaps the response into #telemetry-panel.",
 		Server: "Go reads the shared in-memory state, advances the deterministic telemetry values, and renders only the telemetry fragment.",
 		Client: "The browser supplies the click and DOM target. HTMX performs the request and replacement; no client-side metric calculation is needed.",
+		Markup: `<button hx-get="/demo/telemetry" hx-target="#telemetry-panel" hx-swap="innerHTML" hx-indicator="#telemetry-loading">Refresh telemetry</button>`,
+		Code: `func (s *Server) handleTelemetry(w http.ResponseWriter, r *http.Request) {
+	s.renderFragment(w, http.StatusOK, "telemetry", s.state.RefreshTelemetry())
+}`,
 	},
 	"search": {
 		Title:  "Debounce without a search framework",
 		HTMX:   "The input uses hx-trigger=\"input changed delay:300ms\" with hx-get and hx-target, so typing settles before a request is sent.",
 		Server: "Go receives q, filters the command catalog, and returns matching command buttons as HTML.",
 		Client: "The browser owns the text cursor and input value. HTMX owns the debounce timer, request, loading state, and swap.",
+		Markup: `<input name="q" hx-get="/demo/search" hx-trigger="input changed delay:300ms" hx-target="#search-results" hx-indicator="#search-loading">`,
+		Code: `func (s *Server) handleSearch(w http.ResponseWriter, r *http.Request) {
+	query := r.URL.Query().Get("q")
+	s.renderFragment(w, http.StatusOK, "search-results", struct {
+		Query   string
+		Results []Command
+	}{Query: query, Results: s.state.Search(query)})
+}`,
 	},
 	"command": {
 		Title:  "One POST, two HTML updates",
 		HTMX:   "The form uses hx-post and swaps the command result normally while hx-swap-oob updates #metric-requests from the same response.",
 		Server: "Go validates the command, increments the request metric, and renders both the success result and the out-of-band metric markup.",
 		Client: "The browser serializes the form. HTMX inserts the main result and finds the OOB element by id; no JSON store exists in the page.",
+		Markup: `<form hx-post="/demo/command" hx-target="#command-result" hx-swap="innerHTML" hx-indicator="#command-loading">`,
+		Code: `func (s *Server) handleCommand(w http.ResponseWriter, r *http.Request) {
+	if err := r.ParseForm(); err != nil {
+		s.renderError(w, r, http.StatusBadRequest, "Invalid command", "The command payload could not be read.")
+		return
+	}
+	command, snapshot, ok := s.state.ExecuteCommand(r.FormValue("command"))
+	if !ok {
+		s.renderError(w, r, http.StatusUnprocessableEntity, "Command required", "Command is required before dispatch.")
+		return
+	}
+	s.renderFragment(w, http.StatusOK, "command-result", commandData{Command: command, Snapshot: snapshot})
+}`,
 	},
 	"health": {
 		Title:  "Polling that stays server-driven",
 		HTMX:   "hx-trigger=\"every 5s\" schedules a GET and hx-target=\"this\" replaces the health panel contents.",
 		Server: "Go advances the health check sequence, derives the current state, and returns a small status fragment.",
 		Client: "The browser only keeps the polling timer and target element. Health state is never duplicated in JavaScript.",
+		Markup: `<section hx-get="/demo/status" hx-trigger="every 5s" hx-target="this" hx-swap="innerHTML">`,
+		Code: `func (s *Server) handleStatus(w http.ResponseWriter, r *http.Request) {
+	s.renderFragment(w, http.StatusOK, "status", s.state.Status())
+}`,
 	},
 	"activity": {
 		Title:  "HTML list mutations",
 		HTMX:   "The add form uses hx-post with afterbegin; each delete button uses hx-delete, closest article, hx-swap=delete, and hx-confirm.",
 		Server: "Go validates and stores activity items, or removes an id, then returns the new article or an error response.",
 		Client: "The browser provides form and confirmation events. HTMX inserts or removes the targeted article without owning the activity list.",
+		Markup: `<form hx-post="/demo/activity" hx-target="#activity-list" hx-swap="afterbegin" hx-indicator="#activity-loading">`,
+		Code: `func (s *Server) handleAddActivity(w http.ResponseWriter, r *http.Request) {
+	if err := r.ParseForm(); err != nil {
+		s.renderError(w, r, http.StatusBadRequest, "Invalid activity", "The activity payload could not be read.")
+		return
+	}
+	activity, ok := s.state.AddActivity(r.FormValue("message"))
+	if !ok {
+		s.renderError(w, r, http.StatusUnprocessableEntity, "Activity required", "Activity message is required.")
+		return
+	}
+	s.renderFragment(w, http.StatusOK, "activity-item", activity)
+}`,
 	},
 	"profile": {
 		Title:  "PUT editing with an HTML fallback",
 		HTMX:   "The edit form uses hx-put to save into #profile-panel; hx-get can load the form again when the display view is shown.",
 		Server: "Go validates the profile value, updates shared state, and renders the display fragment after a successful PUT.",
 		Client: "The browser owns focus and native required-field validation. HTMX sends the form and replaces the panel with server-rendered markup.",
+		Markup: `<form hx-put="/demo/profile" hx-target="#profile-panel" hx-swap="innerHTML">`,
+		Code: `func (s *Server) handleProfileUpdate(w http.ResponseWriter, r *http.Request) {
+	if err := r.ParseForm(); err != nil {
+		s.renderError(w, r, http.StatusBadRequest, "Invalid profile", "The profile payload could not be read.")
+		return
+	}
+	if !s.state.UpdateProfile(r.FormValue("profile")) {
+		s.renderError(w, r, http.StatusUnprocessableEntity, "Profile required", "Profile value is required.")
+		return
+	}
+	s.renderFragment(w, http.StatusOK, "profile", s.state.Snapshot())
+}`,
 	},
 	"lazy": {
 		Title:  "Request only when revealed",
 		HTMX:   "hx-trigger=\"revealed\" starts the GET when the panel enters the viewport, targeting itself for an innerHTML swap.",
 		Server: "Go renders the architecture detail only when /demo/lazy is requested; it is not precomputed into the initial fragment.",
 		Client: "The browser observes viewport visibility. HTMX turns that visibility event into a request and then removes the loading copy through the swap.",
+		Markup: `<section hx-get="/demo/lazy" hx-trigger="revealed" hx-target="this" hx-swap="innerHTML">`,
+		Code: `func (s *Server) handleLazy(w http.ResponseWriter, r *http.Request) {
+	s.renderFragment(w, http.StatusOK, "lazy-panel", s.state.Snapshot())
+}`,
 	},
 	"sse": {
 		Title:  "Events instead of polling",
 		HTMX:   "The local SSE extension opens sse-connect=/events and listens for the signal event named by sse-swap.",
 		Server: "Go keeps an event-stream response open, flushes deterministic event/data frames, and stops when the client disconnects.",
 		Client: "The browser maintains the EventSource connection. The SSE extension routes each HTML payload into #event-stream; there is no polling timer.",
+		Markup: `<section hx-ext="sse" sse-connect="/events" sse-target="#event-stream" sse-swap="signal">`,
+		Code: `func (s *Server) handleEvents(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("Content-Type", "text/event-stream")
+	w.Header().Set("Cache-Control", "no-cache")
+	w.Header().Set("Connection", "keep-alive")
+	// The handler then flushes each event until the client disconnects.
+}`,
 	},
 }
 
