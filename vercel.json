@@ -1,4 +1,4 @@
 {
   "$schema": "https://openapi.vercel.sh/vercel.json",
-  "buildCommand": "go build -trimpath -o server ./cmd/server"
+  "buildCommand": "go build -buildvcs=false -trimpath -o server ./cmd/server"
 }
