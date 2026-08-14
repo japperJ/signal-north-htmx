@@ -123,7 +123,7 @@ Inspect the image and container, wait for the healthcheck to report healthy, and
 
 ## Vercel Hobby Deployment
 
-The application can also run as a separate Vercel Hobby project. Vercel builds the Go server directly and does not use the Dockerfile for this deployment.
+The application can also run as a separate Vercel Hobby project. The Vercel project uses the Go framework preset and builds the Go server directly; it does not use the Dockerfile for this deployment.
 
 The Vercel build configuration is in `vercel.json`. The server detects the Vercel runtime and emits a bounded SSE burst so the function can complete within serverless execution limits. The browser reconnects for subsequent signal bursts. In-memory demo state remains ephemeral.
 
