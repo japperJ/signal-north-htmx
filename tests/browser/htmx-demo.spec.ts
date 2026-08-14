@@ -73,7 +73,7 @@ test.describe('Signal North HTMX showcase', () => {
 
   test('explains every demo card through a server-rendered fragment', async ({ page }) => {
     await page.goto('/');
-    const demos = ['telemetry', 'search', 'command', 'health', 'activity', 'profile', 'lazy', 'sse'];
+    const demos = ['telemetry', 'search', 'command', 'health', 'activity', 'profile', 'lazy', 'sse', 'history'];
     await expect(page.getByRole('button', { name: 'Explain' })).toHaveCount(demos.length);
     for (const demo of demos) {
       await page.locator(`button[hx-get="/demo/explain?demo=${demo}"]`).click();
@@ -82,6 +82,13 @@ test.describe('Signal North HTMX showcase', () => {
       await expect(explanation).toContainText('Server / Go');
       await expect(explanation).toContainText('Browser / client');
     }
+  });
+
+  test('pushes HTMX navigation into browser history', async ({ page }) => {
+    await page.goto('/');
+    await page.getByRole('link', { name: 'Open request history' }).click();
+    await expect(page.locator('#history-result')).toContainText('History entry loaded');
+    expect(new URL(page.url()).pathname).toBe('/demo/history');
   });
 
   test('has no horizontal overflow on mobile', async ({ page }) => {

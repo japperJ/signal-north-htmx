@@ -123,6 +123,17 @@
         <section id="event-stream" class="event-stream" hx-ext="sse" sse-connect="/events" sse-target="#event-stream" sse-swap="signal" aria-live="polite">Waiting for signal...</section>
         <div id="explain-sse" class="explanation-region" aria-live="polite"></div>
       </section>
+
+      <section class="panel panel-history" aria-labelledby="history-title">
+        <div class="panel-heading">
+          <div><span class="kicker">09 / HISTORY</span><h2 id="history-title">URL state</h2></div>
+          <div class="panel-actions"><button class="explain-button" type="button" hx-get="/demo/explain?demo=history" hx-target="#explain-history" hx-swap="innerHTML" aria-controls="explain-history">Explain</button><span class="panel-index">PUSH URL</span></div>
+        </div>
+        <p class="history-copy">Keep navigation meaningful while swapping only the part of the page that changed.</p>
+        <a class="button button-secondary" href="/demo/history" hx-get="/demo/history" hx-target="#history-result" hx-swap="innerHTML" hx-push-url="true">Open request history</a>
+        <div id="history-result" class="history-result-region" aria-live="polite">The address bar will change without a full-page reload.</div>
+        <div id="explain-history" class="explanation-region" aria-live="polite"></div>
+      </section>
     </div>
 
     <div id="toast-region" class="toast-region" aria-live="polite"></div>

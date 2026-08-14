@@ -182,7 +182,7 @@ func TestStatusAndLazy(t *testing.T) {
 
 func TestExplanations(t *testing.T) {
 	app := newTestApp(t)
-	for _, demo := range []string{"telemetry", "search", "command", "health", "activity", "profile", "lazy", "sse"} {
+	for _, demo := range []string{"telemetry", "search", "command", "health", "activity", "profile", "lazy", "sse", "history"} {
 		res := httptest.NewRecorder()
 		app.ServeHTTP(res, httptest.NewRequest(http.MethodGet, "/demo/explain?demo="+demo, nil))
 		body := res.Body.String()
@@ -195,6 +195,15 @@ func TestExplanations(t *testing.T) {
 	app.ServeHTTP(res, httptest.NewRequest(http.MethodGet, "/demo/explain?demo=unknown", nil))
 	if res.Code != http.StatusNotFound {
 		t.Fatalf("unknown explanation status = %d, want 404", res.Code)
+	}
+}
+
+func TestHistory(t *testing.T) {
+	app := newTestApp(t)
+	res := httptest.NewRecorder()
+	app.ServeHTTP(res, httptest.NewRequest(http.MethodGet, "/demo/history", nil))
+	if res.Code != http.StatusOK || strings.Contains(res.Body.String(), "<html") || !strings.Contains(res.Body.String(), "History entry loaded") {
+		t.Fatalf("history response = %d %s", res.Code, res.Body.String())
 	}
 }
 

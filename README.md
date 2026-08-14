@@ -155,6 +155,7 @@ GitHub Actions runs the Go tests, race tests, static analysis, and Playwright su
 | GET | `/demo/status` | Polled health fragment |
 | GET | `/demo/lazy` | Revealed architecture fragment |
 | GET | `/demo/explain?demo=telemetry` | HTMX/server/browser explanation fragment |
+| GET | `/demo/history` | `hx-push-url` history fragment |
 | GET | `/events` | SSE signal stream |
 
 Missing fragment and static asset paths return 404 rather than the homepage.

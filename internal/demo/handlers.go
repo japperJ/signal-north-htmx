@@ -161,6 +161,16 @@ var explanations = map[string]explanationData{
 	// The handler then flushes each event until the client disconnects.
 }`,
 	},
+	"history": {
+		Title:  "Navigation state without a router library",
+		HTMX:   "hx-push-url updates the browser address and history after the HTML swap, so Back and Forward remain meaningful.",
+		Server: "Go handles /demo/history like any other route and returns a small HTML fragment. The server remains the source of the rendered state.",
+		Client: "The browser owns the address bar and history stack. HTMX changes the URL without a full-page reload; there is no client-side router.",
+		Markup: `<a href="/demo/history" hx-get="/demo/history" hx-target="#history-result" hx-swap="innerHTML" hx-push-url="true">Open request history</a>`,
+		Code: `func (s *Server) handleHistory(w http.ResponseWriter, r *http.Request) {
+	s.renderFragment(w, http.StatusOK, "history", s.state.Status())
+}`,
+	},
 }
 
 func New(templateFS fs.FS) (*Server, error) {
@@ -200,6 +210,7 @@ func NewWithState(templateFS fs.FS, state *State) (*Server, error) {
 	server.mux.HandleFunc("GET /demo/status", server.handleStatus)
 	server.mux.HandleFunc("GET /demo/lazy", server.handleLazy)
 	server.mux.HandleFunc("GET /demo/explain", server.handleExplain)
+	server.mux.HandleFunc("GET /demo/history", server.handleHistory)
 	server.mux.HandleFunc("GET /events", server.handleEvents)
 	return server, nil
 }
@@ -309,6 +320,10 @@ func (s *Server) handleExplain(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	s.renderFragment(w, http.StatusOK, "explanation", explanation)
+}
+
+func (s *Server) handleHistory(w http.ResponseWriter, r *http.Request) {
+	s.renderFragment(w, http.StatusOK, "history", s.state.Status())
 }
 
 func (s *Server) handleEvents(w http.ResponseWriter, r *http.Request) {
