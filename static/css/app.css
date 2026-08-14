@@ -115,6 +115,10 @@ button, a, input { -webkit-tap-highlight-color: transparent; }
 .explanation-grid div { min-width: 0; }
 .explanation-grid dt { color: var(--lime); font-size: 9px; font-weight: 700; letter-spacing: .12em; text-transform: uppercase; }
 .explanation-grid dd { margin: 7px 0 0; color: var(--muted); font-size: 11px; line-height: 1.55; }
+.code-disclosure { margin-top: 17px; border-top: 1px solid var(--line); padding-top: 13px; }
+.code-disclosure summary { color: var(--cyan); cursor: pointer; font-size: 10px; font-weight: 700; letter-spacing: .1em; text-transform: uppercase; }
+.code-disclosure summary:hover { color: var(--lime); }
+.function-code { overflow-x: auto; margin: 13px 0 0; border: 1px solid var(--line); padding: 15px; background: rgba(0, 0, 0, .28); color: var(--warm); font: 11px/1.6 ui-monospace, SFMono-Regular, Consolas, monospace; white-space: pre; }
 .result-card { display: flex; align-items: center; gap: 12px; }
 .result-card > div { flex: 1; }
 .result-card strong { color: var(--warm); font-size: 13px; }

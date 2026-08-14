@@ -6,5 +6,13 @@
     <div><dt>Server / Go</dt><dd>{{.Server}}</dd></div>
     <div><dt>Browser / client</dt><dd>{{.Client}}</dd></div>
   </dl>
+  <details class="code-disclosure">
+    <summary>Show exact HTMX markup</summary>
+    <pre class="function-code"><code>{{.Markup}}</code></pre>
+  </details>
+  <details class="code-disclosure">
+    <summary>Show exact Go function</summary>
+    <pre class="function-code"><code>{{.Code}}</code></pre>
+  </details>
 </aside>
 {{end}}
