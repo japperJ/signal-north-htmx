@@ -48,6 +48,12 @@ func TestRouterForwardsRequiredRoutes(t *testing.T) {
 		{"lazy", http.MethodGet, "/demo/lazy", "demo"},
 		{"explanation", http.MethodGet, "/demo/explain?demo=telemetry", "demo"},
 		{"history", http.MethodGet, "/demo/history", "demo"},
+		{"shaping", http.MethodGet, "/demo/shaping", "demo"},
+		{"sync", http.MethodPost, "/demo/sync", "demo"},
+		{"headers", http.MethodGet, "/demo/headers", "demo"},
+		{"header-notice", http.MethodGet, "/demo/header-notice", "demo"},
+		{"transition", http.MethodGet, "/demo/transition", "demo"},
+		{"validate", http.MethodPost, "/demo/validate", "demo"},
 		{"events", http.MethodGet, "/events", "events"},
 	}
 

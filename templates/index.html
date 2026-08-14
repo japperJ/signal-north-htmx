@@ -134,6 +134,63 @@
         <div id="history-result" class="history-result-region" aria-live="polite">The address bar will change without a full-page reload.</div>
         <div id="explain-history" class="explanation-region" aria-live="polite"></div>
       </section>
+
+      <section class="panel panel-shaping" aria-labelledby="shaping-title">
+        <div class="panel-heading">
+          <div><span class="kicker">10 / SHAPING</span><h2 id="shaping-title">Request shaping</h2></div>
+          <div class="panel-actions"><button class="explain-button" type="button" hx-get="/demo/explain?demo=shaping" hx-target="#explain-shaping" hx-swap="innerHTML" aria-controls="explain-shaping">Explain</button><span class="panel-index">SELECT</span></div>
+        </div>
+        <label class="field-label" for="shaping-context">Request context</label>
+        <div class="input-row"><input id="shaping-context" class="field" name="context" value="north-1"><button class="button button-secondary" type="button" hx-get="/demo/shaping" hx-include="#shaping-context" hx-vals='{"mode":"safe"}' hx-select=".selected-panel" hx-target="#shaping-result" hx-swap="innerHTML">Run shaped request</button></div>
+        <div id="shaping-result" class="advanced-result" aria-live="polite">The server response contains an envelope; hx-select extracts the selected panel.</div>
+        <div id="explain-shaping" class="explanation-region" aria-live="polite"></div>
+      </section>
+
+      <section class="panel panel-sync" aria-labelledby="sync-title">
+        <div class="panel-heading">
+          <div><span class="kicker">11 / COORDINATION</span><h2 id="sync-title">Request coordination</h2></div>
+          <div class="panel-actions"><button class="explain-button" type="button" hx-get="/demo/explain?demo=sync" hx-target="#explain-sync" hx-swap="innerHTML" aria-controls="explain-sync">Explain</button><span class="panel-index">SYNC</span></div>
+        </div>
+        <form class="stack-form" method="post" action="/demo/sync" hx-post="/demo/sync" hx-sync="this:replace" hx-disabled-elt="find button" hx-target="#sync-result" hx-swap="innerHTML">
+          <label for="sync-service">Service check</label>
+          <div class="input-row"><input id="sync-service" class="field" name="service" value="api"><button class="button button-secondary" type="submit">Run latest check</button></div>
+        </form>
+        <div id="sync-result" class="advanced-result" aria-live="polite">The newest request owns this result.</div>
+        <div id="explain-sync" class="explanation-region" aria-live="polite"></div>
+      </section>
+
+      <section class="panel panel-headers" aria-labelledby="headers-title">
+        <div class="panel-heading">
+          <div><span class="kicker">12 / SIGNALING</span><h2 id="headers-title">Response headers</h2></div>
+          <div class="panel-actions"><button class="explain-button" type="button" hx-get="/demo/explain?demo=headers" hx-target="#explain-headers" hx-swap="innerHTML" aria-controls="explain-headers">Explain</button><span class="panel-index">TRIGGER</span></div>
+        </div>
+        <button class="button button-secondary" type="button" hx-get="/demo/headers" hx-target="#headers-result" hx-swap="innerHTML">Ping server signal</button>
+        <div id="headers-result" class="advanced-result" aria-live="polite">Waiting for HX-Trigger: server-signal.</div>
+        <div id="header-notice" class="header-notice-region" hx-trigger="server-signal from:body" hx-get="/demo/header-notice" hx-target="this" hx-swap="innerHTML" aria-live="polite">No follow-up event yet.</div>
+        <div id="explain-headers" class="explanation-region" aria-live="polite"></div>
+      </section>
+
+      <section class="panel panel-transition" aria-labelledby="transition-title">
+        <div class="panel-heading">
+          <div><span class="kicker">13 / SWAP TIMING</span><h2 id="transition-title">Swap transitions</h2></div>
+          <div class="panel-actions"><button class="explain-button" type="button" hx-get="/demo/explain?demo=transition" hx-target="#explain-transition" hx-swap="innerHTML" aria-controls="explain-transition">Explain</button><span class="panel-index">SETTLE</span></div>
+        </div>
+        <div id="transition-result" class="transition-result"><div><span class="status-dot status-dot-cyan"></span><strong>Ready for a timed swap</strong><p>The response will replace this whole region.</p></div><button class="button button-secondary" type="button" hx-get="/demo/transition" hx-target="#transition-result" hx-swap="outerHTML transition:true swap:150ms settle:250ms">Run transition</button></div>
+        <div id="explain-transition" class="explanation-region" aria-live="polite"></div>
+      </section>
+
+      <section class="panel panel-validation" aria-labelledby="validation-title">
+        <div class="panel-heading">
+          <div><span class="kicker">14 / VALIDATION</span><h2 id="validation-title">HTML plus server validation</h2></div>
+          <div class="panel-actions"><button class="explain-button" type="button" hx-get="/demo/explain?demo=validate" hx-target="#explain-validate" hx-swap="innerHTML" aria-controls="explain-validate">Explain</button><span class="panel-index">422</span></div>
+        </div>
+        <form class="stack-form" method="post" action="/demo/validate" hx-post="/demo/validate" hx-validate="true" hx-disabled-elt="find button" hx-target="#validate-result" hx-swap="innerHTML">
+          <label for="validate-service">Service identifier</label>
+          <div class="input-row"><input id="validate-service" class="field" name="service" value="api-service" pattern="[a-z-]+" required><button class="button button-secondary" type="submit">Validate config</button></div>
+        </form>
+        <div id="validate-result" class="advanced-result" aria-live="polite">Use lowercase letters and hyphens.</div>
+        <div id="explain-validate" class="explanation-region" aria-live="polite"></div>
+      </section>
     </div>
 
     <div id="toast-region" class="toast-region" aria-live="polite"></div>

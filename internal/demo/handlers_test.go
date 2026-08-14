@@ -182,7 +182,7 @@ func TestStatusAndLazy(t *testing.T) {
 
 func TestExplanations(t *testing.T) {
 	app := newTestApp(t)
-	for _, demo := range []string{"telemetry", "search", "command", "health", "activity", "profile", "lazy", "sse", "history"} {
+	for _, demo := range []string{"telemetry", "search", "command", "health", "activity", "profile", "lazy", "sse", "history", "shaping", "sync", "headers", "transition", "validate"} {
 		res := httptest.NewRecorder()
 		app.ServeHTTP(res, httptest.NewRequest(http.MethodGet, "/demo/explain?demo="+demo, nil))
 		body := res.Body.String()
@@ -204,6 +204,43 @@ func TestHistory(t *testing.T) {
 	app.ServeHTTP(res, httptest.NewRequest(http.MethodGet, "/demo/history", nil))
 	if res.Code != http.StatusOK || strings.Contains(res.Body.String(), "<html") || !strings.Contains(res.Body.String(), "History entry loaded") {
 		t.Fatalf("history response = %d %s", res.Code, res.Body.String())
+	}
+}
+
+func TestAdvancedHTMXFeatures(t *testing.T) {
+	app := newTestApp(t)
+
+	res := httptest.NewRecorder()
+	app.ServeHTTP(res, httptest.NewRequest(http.MethodGet, "/demo/shaping?context=north-1&mode=safe", nil))
+	if res.Code != http.StatusOK || !strings.Contains(res.Body.String(), "north-1") {
+		t.Fatalf("shaping response = %d %s", res.Code, res.Body.String())
+	}
+
+	res = httptest.NewRecorder()
+	app.ServeHTTP(res, httptest.NewRequest(http.MethodPost, "/demo/sync", strings.NewReader("service=api")))
+	if res.Code != http.StatusOK || !strings.Contains(res.Body.String(), "Synchronized check accepted") {
+		t.Fatalf("sync response = %d %s", res.Code, res.Body.String())
+	}
+
+	res = httptest.NewRecorder()
+	app.ServeHTTP(res, httptest.NewRequest(http.MethodGet, "/demo/headers", nil))
+	if res.Code != http.StatusOK || res.Header().Get("HX-Trigger") != "server-signal" {
+		t.Fatalf("header response = %d trigger=%q", res.Code, res.Header().Get("HX-Trigger"))
+	}
+
+	res = httptest.NewRecorder()
+	app.ServeHTTP(res, httptest.NewRequest(http.MethodGet, "/demo/transition", nil))
+	if res.Code != http.StatusOK || !strings.Contains(res.Body.String(), "Transition complete") {
+		t.Fatalf("transition response = %d %s", res.Code, res.Body.String())
+	}
+
+	res = httptest.NewRecorder()
+	validateRequest := httptest.NewRequest(http.MethodPost, "/demo/validate", strings.NewReader("service=api-service"))
+	validateRequest.Header.Set("Content-Type", "application/x-www-form-urlencoded")
+	validateRequest.Header.Set("HX-Request", "true")
+	app.ServeHTTP(res, validateRequest)
+	if res.Code != http.StatusOK || !strings.Contains(res.Body.String(), "Validation passed") {
+		t.Fatalf("validation response = %d %s", res.Code, res.Body.String())
 	}
 }
 

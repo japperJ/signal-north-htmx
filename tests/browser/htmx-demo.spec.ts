@@ -73,7 +73,7 @@ test.describe('Signal North HTMX showcase', () => {
 
   test('explains every demo card through a server-rendered fragment', async ({ page }) => {
     await page.goto('/');
-    const demos = ['telemetry', 'search', 'command', 'health', 'activity', 'profile', 'lazy', 'sse', 'history'];
+    const demos = ['telemetry', 'search', 'command', 'health', 'activity', 'profile', 'lazy', 'sse', 'history', 'shaping', 'sync', 'headers', 'transition', 'validate'];
     await expect(page.getByRole('button', { name: 'Explain' })).toHaveCount(demos.length);
     for (const demo of demos) {
       await page.locator(`button[hx-get="/demo/explain?demo=${demo}"]`).click();
@@ -89,6 +89,26 @@ test.describe('Signal North HTMX showcase', () => {
     await page.getByRole('link', { name: 'Open request history' }).click();
     await expect(page.locator('#history-result')).toContainText('History entry loaded');
     expect(new URL(page.url()).pathname).toBe('/demo/history');
+  });
+
+  test('runs advanced request and response features', async ({ page }) => {
+    await page.goto('/');
+
+    await page.getByRole('button', { name: 'Run shaped request' }).click();
+    await expect(page.locator('#shaping-result')).toContainText('north-1');
+
+    await page.getByRole('button', { name: 'Run latest check' }).click();
+    await expect(page.locator('#sync-result')).toContainText('Synchronized check accepted');
+
+    await page.getByRole('button', { name: 'Ping server signal' }).click();
+    await expect(page.locator('#headers-result')).toContainText('Server signal emitted');
+    await expect(page.locator('#header-notice')).toContainText('Follow-up fragment loaded');
+
+    await page.getByRole('button', { name: 'Run transition' }).click();
+    await expect(page.locator('#transition-result')).toContainText('Transition complete');
+
+    await page.getByRole('button', { name: 'Validate config' }).click();
+    await expect(page.locator('#validate-result')).toContainText('Validation passed');
   });
 
   test('has no horizontal overflow on mobile', async ({ page }) => {

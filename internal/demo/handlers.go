@@ -171,6 +171,67 @@ var explanations = map[string]explanationData{
 	s.renderFragment(w, http.StatusOK, "history", s.state.Status())
 }`,
 	},
+	"shaping": {
+		Title:  "Shape the request and select the response",
+		HTMX:   "hx-include adds a separate field, hx-vals adds a fixed value, and hx-select keeps only .selected-panel from the server response.",
+		Server: "Go reads context and mode, renders an envelope with the selected panel inside it, and never returns JSON.",
+		Client: "The browser owns the form fields. HTMX assembles the request and extracts the selected HTML before swapping it into the result region.",
+		Markup: `<button hx-get="/demo/shaping" hx-include="#shaping-context" hx-vals='{"mode":"safe"}' hx-select=".selected-panel" hx-target="#shaping-result" hx-swap="innerHTML">Run shaped request</button>`,
+		Code: `func (s *Server) handleShaping(w http.ResponseWriter, r *http.Request) {
+	data := struct{ Context, Mode string }{
+		Context: r.URL.Query().Get("context"),
+		Mode: r.URL.Query().Get("mode"),
+	}
+	s.renderFragment(w, http.StatusOK, "shaping", data)
+}`,
+	},
+	"sync": {
+		Title:  "Keep competing requests coordinated",
+		HTMX:   "hx-sync replaces an in-flight request with the newest one, while hx-disabled-elt prevents duplicate submits during the active request.",
+		Server: "Go handles the latest service check and returns one deterministic result fragment.",
+		Client: "The browser can issue overlapping interactions, but HTMX coordinates them and temporarily disables the action control.",
+		Markup: `<form hx-post="/demo/sync" hx-sync="this:replace" hx-disabled-elt="find button" hx-target="#sync-result" hx-swap="innerHTML">`,
+		Code: `func (s *Server) handleSync(w http.ResponseWriter, r *http.Request) {
+	_ = r.ParseForm()
+	s.renderFragment(w, http.StatusOK, "sync", r.FormValue("service"))
+}`,
+	},
+	"headers": {
+		Title:  "Use a response header as an event",
+		HTMX:   "The request swaps its result and the HX-Trigger response header emits server-signal, which another HTMX element listens for.",
+		Server: "Go sets HX-Trigger: server-signal and returns HTML. A second endpoint supplies the event notice when HTMX receives that signal.",
+		Client: "The browser does not parse the header itself. HTMX turns it into a DOM event and issues the follow-up HTML request declaratively.",
+		Markup: `<button hx-get="/demo/headers" hx-target="#headers-result" hx-swap="innerHTML">Ping server signal</button>`,
+		Code: `func (s *Server) handleHeaders(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("HX-Trigger", "server-signal")
+	s.renderFragment(w, http.StatusOK, "headers", nil)
+}`,
+	},
+	"transition": {
+		Title:  "Tune the swap lifecycle",
+		HTMX:   "hx-swap can include transition, swap, and settle modifiers to control how the replacement enters and settles in the DOM.",
+		Server: "Go returns the same target shape with fresh server-rendered content; it does not animate or manage browser state.",
+		Client: "HTMX coordinates the browser swap timing and View Transition behavior while CSS supplies the visual treatment.",
+		Markup: `<button hx-get="/demo/transition" hx-target="#transition-result" hx-swap="outerHTML transition:true swap:150ms settle:250ms">Run transition</button>`,
+		Code: `func (s *Server) handleTransition(w http.ResponseWriter, r *http.Request) {
+	s.renderFragment(w, http.StatusOK, "transition", nil)
+}`,
+	},
+	"validate": {
+		Title:  "Let HTML and the server validate",
+		HTMX:   "hx-validate enables native constraint checks before the request, while hx-disabled-elt keeps the submit control safe during the request.",
+		Server: "Go performs the server-side validation too and returns a 422 fragment for invalid service names or a success fragment for valid input.",
+		Client: "The browser handles required and pattern checks. HTMX sends valid data and swaps the server result; there is no duplicated client validation state.",
+		Markup: `<form hx-post="/demo/validate" hx-validate="true" hx-disabled-elt="find button" hx-target="#validate-result" hx-swap="innerHTML">`,
+		Code: `func (s *Server) handleValidate(w http.ResponseWriter, r *http.Request) {
+	_ = r.ParseForm()
+	if !validServiceName(r.FormValue("service")) {
+		s.renderError(w, r, http.StatusUnprocessableEntity, "Validation failed", "Use lowercase letters and hyphens only.")
+		return
+	}
+	s.renderFragment(w, http.StatusOK, "validation", r.FormValue("service"))
+}`,
+	},
 }
 
 func New(templateFS fs.FS) (*Server, error) {
@@ -211,6 +272,12 @@ func NewWithState(templateFS fs.FS, state *State) (*Server, error) {
 	server.mux.HandleFunc("GET /demo/lazy", server.handleLazy)
 	server.mux.HandleFunc("GET /demo/explain", server.handleExplain)
 	server.mux.HandleFunc("GET /demo/history", server.handleHistory)
+	server.mux.HandleFunc("GET /demo/shaping", server.handleShaping)
+	server.mux.HandleFunc("POST /demo/sync", server.handleSync)
+	server.mux.HandleFunc("GET /demo/headers", server.handleHeaders)
+	server.mux.HandleFunc("GET /demo/header-notice", server.handleHeaderNotice)
+	server.mux.HandleFunc("GET /demo/transition", server.handleTransition)
+	server.mux.HandleFunc("POST /demo/validate", server.handleValidate)
 	server.mux.HandleFunc("GET /events", server.handleEvents)
 	return server, nil
 }
@@ -324,6 +391,62 @@ func (s *Server) handleExplain(w http.ResponseWriter, r *http.Request) {
 
 func (s *Server) handleHistory(w http.ResponseWriter, r *http.Request) {
 	s.renderFragment(w, http.StatusOK, "history", s.state.Status())
+}
+
+func (s *Server) handleShaping(w http.ResponseWriter, r *http.Request) {
+	context := r.URL.Query().Get("context")
+	if context == "" {
+		context = "north-1"
+	}
+	mode := r.URL.Query().Get("mode")
+	if mode == "" {
+		mode = "safe"
+	}
+	s.renderFragment(w, http.StatusOK, "shaping", struct{ Context, Mode string }{Context: context, Mode: mode})
+}
+
+func (s *Server) handleSync(w http.ResponseWriter, r *http.Request) {
+	_ = r.ParseForm()
+	service := strings.TrimSpace(r.FormValue("service"))
+	if service == "" {
+		service = "api"
+	}
+	s.renderFragment(w, http.StatusOK, "sync", service)
+}
+
+func (s *Server) handleHeaders(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("HX-Trigger", "server-signal")
+	s.renderFragment(w, http.StatusOK, "headers", nil)
+}
+
+func (s *Server) handleHeaderNotice(w http.ResponseWriter, r *http.Request) {
+	s.renderFragment(w, http.StatusOK, "header-notice", time.Now().UTC())
+}
+
+func (s *Server) handleTransition(w http.ResponseWriter, r *http.Request) {
+	s.renderFragment(w, http.StatusOK, "transition", nil)
+}
+
+func (s *Server) handleValidate(w http.ResponseWriter, r *http.Request) {
+	_ = r.ParseForm()
+	service := strings.TrimSpace(r.FormValue("service"))
+	if !validServiceName(service) {
+		s.renderError(w, r, http.StatusUnprocessableEntity, "Validation failed", "Use lowercase letters and hyphens only.")
+		return
+	}
+	s.renderFragment(w, http.StatusOK, "validation", service)
+}
+
+func validServiceName(value string) bool {
+	if value == "" {
+		return false
+	}
+	for _, character := range value {
+		if (character < 'a' || character > 'z') && character != '-' {
+			return false
+		}
+	}
+	return true
 }
 
 func (s *Server) handleEvents(w http.ResponseWriter, r *http.Request) {
