@@ -181,6 +181,15 @@ button, a, input { -webkit-tap-highlight-color: transparent; }
 .transition-result strong { display: block; color: var(--warm); font-size: 12px; }
 .transition-result p { margin: 5px 0 0; color: var(--muted); font-size: 11px; }
 .toast-region { min-height: 20px; }
+.guidance-panel { display: grid; grid-template-columns: minmax(220px, .8fr) 1.5fr; gap: 35px; margin: 0 0 65px; border: 1px solid rgba(255, 156, 84, .28); padding: 28px; background: linear-gradient(135deg, rgba(255, 156, 84, .08), rgba(16, 38, 58, .88)); }
+.guidance-intro h2 { margin: 8px 0 12px; font-size: 26px; letter-spacing: -.05em; }
+.guidance-intro p { margin: 0; color: var(--muted); font-size: 12px; line-height: 1.6; }
+.guidance-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; }
+.guidance-grid div { border-left: 1px solid var(--line); padding-left: 15px; }
+.guidance-grid strong { color: var(--orange); font-size: 11px; letter-spacing: .05em; text-transform: uppercase; }
+.guidance-grid p { margin: 9px 0 0; color: var(--muted); font-size: 11px; line-height: 1.55; }
+.guidance-rule { grid-column: 2; display: flex; align-items: center; gap: 12px; border-top: 1px solid var(--line); padding-top: 16px; color: var(--warm); font-size: 12px; }
+.guidance-rule span { color: var(--lime); font-size: 9px; letter-spacing: .12em; text-transform: uppercase; }
 .site-footer { display: flex; justify-content: space-between; padding: 23px 0 38px; color: #5b7480; font-size: 9px; letter-spacing: .14em; }
 .sr-only { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0, 0, 0, 0); white-space: nowrap; }
 
@@ -193,6 +202,9 @@ button, a, input { -webkit-tap-highlight-color: transparent; }
   .layout-grid { display: block; }
   .panel { margin-top: 14px; }
   .transition-result { align-items: stretch; flex-direction: column; }
+  .guidance-panel { display: block; margin-top: 14px; padding: 21px 17px; }
+  .guidance-grid { grid-template-columns: 1fr; gap: 16px; margin-top: 24px; }
+  .guidance-rule { margin-top: 22px; }
 }
 
 @media (max-width: 520px) {

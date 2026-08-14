@@ -45,6 +45,8 @@ func TestTemplatesAndHomePage(t *testing.T) {
 		"zero custom application JavaScript",
 		"Server-rendered HTML",
 		"HTMX handles browser behavior",
+		"When not to use HTMX",
+		"Use HTMX when the server owns the state",
 		"Refresh telemetry",
 		"Search commands",
 		"Send command",

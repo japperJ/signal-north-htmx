@@ -193,6 +193,20 @@
       </section>
     </div>
 
+    <aside class="guidance-panel" aria-labelledby="when-not-title">
+      <div class="guidance-intro">
+        <span class="kicker">FIELD NOTE / CHOOSE THE TOOL</span>
+        <h2 id="when-not-title">When not to use HTMX</h2>
+        <p>Use HTMX when the server owns the state and an HTML response is the natural result. Choose a client-side tool when the interaction is primarily local, continuous, or offline.</p>
+      </div>
+      <div class="guidance-grid">
+        <div><strong>Prefer client JavaScript</strong><p>For canvas, drag-and-drop, games, rich editors, audio work, or high-frequency interactions that must respond without a network round trip.</p></div>
+        <div><strong>Prefer a client app</strong><p>For large client-owned state graphs, complex offline workflows, or interfaces where most screens are calculated from local data.</p></div>
+        <div><strong>Prefer plain HTML</strong><p>For simple navigation, static content, and forms that do not need partial updates. Do not add HTMX just because it is available.</p></div>
+      </div>
+      <div class="guidance-rule"><span>Rule of thumb</span><strong>Keep the source of truth close to the state that changes.</strong></div>
+    </aside>
+
     <div id="toast-region" class="toast-region" aria-live="polite"></div>
   </main>
   <footer class="site-footer"><span>SIGNAL NORTH / OPERATIONAL FIELD GUIDE</span><span>HTMX 2.0.4 / GO SERVER</span></footer>
