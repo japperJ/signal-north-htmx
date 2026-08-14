@@ -1,0 +1,7 @@
+{{define "edit-form"}}
+<form class="profile-form" method="post" action="/demo/profile" hx-put="/demo/profile" hx-target="#profile-panel" hx-swap="innerHTML">
+  <label for="profile-input">Active profile</label>
+  <div class="input-row"><input id="profile-input" class="field" name="profile" value="{{.Profile}}" required><button class="button button-primary" type="submit">Save profile</button></div>
+  <input type="hidden" name="_method" value="PUT">
+</form>
+{{end}}

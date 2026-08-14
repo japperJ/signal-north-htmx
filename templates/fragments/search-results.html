@@ -1,0 +1,8 @@
+{{define "search-results"}}
+{{if .Query}}
+  {{if .Results}}
+    <div class="result-count">{{len .Results}} matching command{{if ne (len .Results) 1}}s{{end}}</div>
+    {{range .Results}}<button class="command-result" type="button" data-command="{{.Name}}" hx-post="/demo/command" hx-target="#command-result" hx-swap="innerHTML"><span class="command-name">{{.Name}}</span><span class="command-description">{{.Description}}</span><span class="command-arrow">↗</span></button>{{end}}
+  {{else}}<div class="empty-state">No command matched “{{.Query}}”. Try deploy, rotate, or inspect.</div>{{end}}
+{{else}}<div class="empty-state">Type a command to search the catalog.</div>{{end}}
+{{end}}

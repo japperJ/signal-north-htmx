@@ -1,0 +1,3 @@
+{{define "status"}}
+<div class="health-main"><span class="health-orb health-orb-{{if eq .Health "Nominal"}}lime{{else}}orange{{end}}"></span><div><strong>{{.Health}}</strong><span>All core routes responding</span></div></div><div class="health-meta"><span>CHECK {{.StatusSequence}}</span><span>{{formatTime .Updated}} UTC</span></div>
+{{end}}

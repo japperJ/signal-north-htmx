@@ -1,0 +1,4 @@
+{{define "command-result"}}
+<div class="result-card result-success"><span class="status-dot status-dot-lime"></span><div><strong>Command accepted</strong><p>{{.Command.Name}} is queued in the control plane.</p></div><span class="result-time">{{formatTime .Snapshot.Updated}} UTC</span></div>
+<div id="metric-requests" class="metric-card metric-card-accent oob-metric" hx-swap-oob="outerHTML"><span class="metric-label">HTMX requests</span><strong class="metric-value">{{.Snapshot.Requests}}<small>total</small></strong><span class="metric-trend">▲ server rendered</span></div>
+{{end}}

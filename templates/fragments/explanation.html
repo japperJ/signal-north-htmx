@@ -1,0 +1,10 @@
+{{define "explanation"}}
+<aside class="explanation-card" aria-label="How this demo works">
+  <div class="explanation-title"><span class="status-dot status-dot-cyan"></span><strong>{{.Title}}</strong></div>
+  <dl class="explanation-grid">
+    <div><dt>HTMX</dt><dd>{{.HTMX}}</dd></div>
+    <div><dt>Server / Go</dt><dd>{{.Server}}</dd></div>
+    <div><dt>Browser / client</dt><dd>{{.Client}}</dd></div>
+  </dl>
+</aside>
+{{end}}

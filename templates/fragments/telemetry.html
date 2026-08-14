@@ -1,0 +1,4 @@
+{{define "telemetry"}}
+<div class="fragment-status"><span class="status-dot status-dot-lime"></span><strong>Telemetry refreshed</strong><span>{{formatTime .Updated}} UTC</span></div>
+<div class="telemetry-bars">{{range .Telemetry}}<div class="telemetry-row"><span>{{.Label}}</span><span class="bar"><i style="width: {{.Percent}}%"></i></span><strong>{{.Value}}{{.Unit}}</strong></div>{{end}}</div>
+{{end}}

@@ -1,0 +1,127 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="htmx-config" content='{"responseHandling":[{"code":"204","swap":false},{"code":"422","swap":true,"error":true},{"code":"[23]..","swap":true},{"code":"[45]..","swap":false,"error":true}]}' >
+  <title>Signal North | Operations Console</title>
+  <link rel="stylesheet" href="/static/css/app.css">
+  <script src="/static/vendor/htmx.min.js"></script>
+  <script src="/static/vendor/htmx-ext-sse.js"></script>
+</head>
+<body>
+  {{template "header" .}}
+  <main id="main-content" class="shell">
+    <section class="hero" aria-labelledby="hero-title">
+      <div class="eyebrow">HTML OVER THE WIRE / CONTROL PLANE</div>
+      <h1 id="hero-title">Signal North keeps<br><em>the signal</em> visible.</h1>
+      <p class="hero-copy">A working field guide to server-driven interfaces. Every panel below is rendered by Go, requested by HTMX, and swapped as HTML.</p>
+      <div class="hero-actions">
+        <a class="button button-primary" href="/demo/status" hx-boost="true" hx-target="#boost-target" hx-swap="innerHTML">Open live status</a>
+        <span class="hero-note"><span class="pulse-dot"></span> No client state required</span>
+      </div>
+      <div id="boost-target" class="boost-target" aria-live="polite">Boost a route to inspect its server-rendered response.</div>
+    </section>
+
+    <section class="metric-strip" aria-label="Operational metrics">
+      {{template "metrics" .Snapshot}}
+    </section>
+
+    <div class="layout-grid">
+      <section class="panel panel-telemetry" aria-labelledby="telemetry-title">
+        <div class="panel-heading">
+          <div><span class="kicker">01 / REQUEST</span><h2 id="telemetry-title">Telemetry refresh</h2></div>
+          <div class="panel-actions"><button class="explain-button" type="button" hx-get="/demo/explain?demo=telemetry" hx-target="#explain-telemetry" hx-swap="innerHTML" aria-controls="explain-telemetry">Explain</button><span class="status-chip status-chip-lime">LIVE</span></div>
+        </div>
+        <div id="telemetry-panel" class="telemetry-panel">{{template "telemetry" .Snapshot}}</div>
+        <div class="panel-footer">
+          <button class="button button-secondary" hx-get="/demo/telemetry" hx-target="#telemetry-panel" hx-swap="innerHTML" hx-indicator="#telemetry-loading">Refresh telemetry</button>
+          <span id="telemetry-loading" class="htmx-indicator loading-label" role="status">Syncing signal...</span>
+        </div>
+        <div id="explain-telemetry" class="explanation-region" aria-live="polite"></div>
+      </section>
+
+      <section class="panel panel-search" aria-labelledby="search-title">
+        <div class="panel-heading">
+          <div><span class="kicker">02 / SEARCH</span><h2 id="search-title">Command catalog</h2></div>
+          <div class="panel-actions"><button class="explain-button" type="button" hx-get="/demo/explain?demo=search" hx-target="#explain-search" hx-swap="innerHTML" aria-controls="explain-search">Explain</button><span class="panel-index">CTRL / K</span></div>
+        </div>
+        <label class="sr-only" for="command-search">Search commands</label>
+        <input id="command-search" class="field field-search" name="q" type="search" placeholder="Search commands..." autocomplete="off" hx-get="/demo/search" hx-trigger="input changed delay:300ms" hx-target="#search-results" hx-indicator="#search-loading">
+        <div class="search-meta"><span id="search-loading" class="htmx-indicator loading-label" role="status">Searching...</span><span>Debounced by 300ms</span></div>
+        <div id="search-results" class="search-results">{{template "search-results" (dict "Query" "" "Results" nil)}}</div>
+        <div id="explain-search" class="explanation-region" aria-live="polite"></div>
+      </section>
+
+      <section class="panel panel-command" aria-labelledby="command-title">
+        <div class="panel-heading">
+          <div><span class="kicker">03 / MUTATION</span><h2 id="command-title">Dispatch command</h2></div>
+          <div class="panel-actions"><button class="explain-button" type="button" hx-get="/demo/explain?demo=command" hx-target="#explain-command" hx-swap="innerHTML" aria-controls="explain-command">Explain</button><span class="status-chip status-chip-cyan">POST</span></div>
+        </div>
+        <form class="stack-form" method="post" action="/demo/command" hx-post="/demo/command" hx-target="#command-result" hx-swap="innerHTML" hx-indicator="#command-loading">
+          <label for="command-input">Command payload</label>
+          <div class="input-row"><input id="command-input" class="field" name="command" placeholder="e.g. deploy api" required><button class="button button-primary" type="submit">Send command</button></div>
+          <div class="form-hint">The response also updates the request metric out-of-band.</div>
+        </form>
+        <span id="command-loading" class="htmx-indicator loading-label" role="status">Dispatching...</span>
+        <div id="command-result" class="result-region" aria-live="polite">Ready for a command.</div>
+        <div id="explain-command" class="explanation-region" aria-live="polite"></div>
+      </section>
+
+      <section class="panel panel-health" aria-labelledby="health-title">
+        <div class="panel-heading">
+          <div><span class="kicker">04 / POLLING</span><h2 id="health-title">Health monitor</h2></div>
+          <div class="panel-actions"><button class="explain-button" type="button" hx-get="/demo/explain?demo=health" hx-target="#explain-health" hx-swap="innerHTML" aria-controls="explain-health">Explain</button><span class="panel-index">EVERY 5S</span></div>
+        </div>
+        <section id="health-status" class="health-status" hx-get="/demo/status" hx-trigger="every 5s" hx-target="this" hx-swap="innerHTML">{{template "status" .Snapshot}}</section>
+        <div id="explain-health" class="explanation-region" aria-live="polite"></div>
+      </section>
+
+      <section class="panel panel-activity" aria-labelledby="activity-title">
+        <div class="panel-heading">
+          <div><span class="kicker">05 / STREAM</span><h2 id="activity-title">Activity stream</h2></div>
+          <div class="panel-actions"><button class="explain-button" type="button" hx-get="/demo/explain?demo=activity" hx-target="#explain-activity" hx-swap="innerHTML" aria-controls="explain-activity">Explain</button><span class="status-chip status-chip-orange">AUDIT</span></div>
+        </div>
+        <form class="activity-form" method="post" action="/demo/activity" hx-post="/demo/activity" hx-target="#activity-list" hx-swap="afterbegin" hx-indicator="#activity-loading">
+          <label class="sr-only" for="activity-input">Add activity</label>
+          <input id="activity-input" class="field" name="message" placeholder="Add an operational note..." required>
+          <button class="button button-secondary" type="submit">Add note</button>
+        </form>
+        <span id="activity-loading" class="htmx-indicator loading-label" role="status">Writing...</span>
+        <div id="activity-list" class="activity-list">{{template "activity" .Snapshot}}</div>
+        <div id="explain-activity" class="explanation-region" aria-live="polite"></div>
+      </section>
+
+      <section class="panel panel-profile" aria-labelledby="profile-title">
+        <div class="panel-heading">
+          <div><span class="kicker">06 / INLINE EDIT</span><h2 id="profile-title">Inline editing</h2></div>
+          <div class="panel-actions"><button class="explain-button" type="button" hx-get="/demo/explain?demo=profile" hx-target="#explain-profile" hx-swap="innerHTML" aria-controls="explain-profile">Explain</button><span class="panel-index">PUT</span></div>
+        </div>
+        <div id="profile-panel" class="profile-panel">{{template "edit-form" .Snapshot}}</div>
+        <div id="explain-profile" class="explanation-region" aria-live="polite"></div>
+      </section>
+
+      <section class="panel panel-lazy" aria-labelledby="lazy-title">
+        <div class="panel-heading">
+          <div><span class="kicker">07 / REVEALED</span><h2 id="lazy-title">Lazy-loaded panel</h2></div>
+          <div class="panel-actions"><button class="explain-button" type="button" hx-get="/demo/explain?demo=lazy" hx-target="#explain-lazy" hx-swap="innerHTML" aria-controls="explain-lazy">Explain</button><span class="panel-index">ON VIEW</span></div>
+        </div>
+        <section id="lazy-panel" class="lazy-panel" hx-get="/demo/lazy" hx-trigger="revealed" hx-target="this" hx-swap="innerHTML">Loading architecture details...</section>
+        <div id="explain-lazy" class="explanation-region" aria-live="polite"></div>
+      </section>
+
+      <section class="panel panel-sse" aria-labelledby="sse-title">
+        <div class="panel-heading">
+          <div><span class="kicker">08 / EVENT STREAM</span><h2 id="sse-title">SSE stream</h2></div>
+          <div class="panel-actions"><button class="explain-button" type="button" hx-get="/demo/explain?demo=sse" hx-target="#explain-sse" hx-swap="innerHTML" aria-controls="explain-sse">Explain</button><span class="status-chip status-chip-cyan">CONNECTED</span></div>
+        </div>
+        <section id="event-stream" class="event-stream" hx-ext="sse" sse-connect="/events" sse-target="#event-stream" sse-swap="signal" aria-live="polite">Waiting for signal...</section>
+        <div id="explain-sse" class="explanation-region" aria-live="polite"></div>
+      </section>
+    </div>
+
+    <div id="toast-region" class="toast-region" aria-live="polite"></div>
+  </main>
+  <footer class="site-footer"><span>SIGNAL NORTH / OPERATIONAL FIELD GUIDE</span><span>HTMX 2.0.4 / GO SERVER</span></footer>
+</body>
+</html>

@@ -1,0 +1,9 @@
+.git
+.next
+node_modules
+test-results
+playwright-report
+htmx-showcase.tar
+*.log
+Dockerfile
+docker-compose.yml

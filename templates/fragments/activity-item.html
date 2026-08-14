@@ -1,0 +1,3 @@
+{{define "activity-item"}}
+<article class="activity-item activity-item-new" id="{{.ID}}"><span class="activity-dot activity-dot-{{.Tone}}"></span><div><p>{{.Message}}</p><span class="activity-time">just now</span></div><button class="icon-button" type="button" hx-delete="/demo/activity/{{.ID}}" hx-target="closest article" hx-swap="delete" hx-confirm="Remove this activity item?" aria-label="Remove {{.Message}}">×</button></article>
+{{end}}
